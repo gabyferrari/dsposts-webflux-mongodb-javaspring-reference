@@ -12,9 +12,6 @@ import com.devsuperior.workshopmongo.entities.User;
 import com.devsuperior.workshopmongo.repositories.PostRepository;
 import com.devsuperior.workshopmongo.repositories.UserRepository;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 @Configuration
 public class SeedingDatabase implements CommandLineRunner {
 
@@ -27,18 +24,19 @@ public class SeedingDatabase implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		Mono<Void> deleteUsers = userRepository.deleteAll();
-		deleteUsers.subscribe();
+		userRepository.deleteAll().subscribe();
 		
-		Mono<Void> deletePosts = postRepository.deleteAll();
-		deletePosts.subscribe();
+		postRepository.deleteAll().subscribe();
 		
 		User maria = new User(null, "Maria Brown", "maria@gmail.com");
 		User alex = new User(null, "Alex Green", "alex@gmail.com");
 		User bob = new User(null, "Bob Grey", "bob@gmail.com");
 		
-		Flux<User> insertUsers = userRepository.saveAll(Arrays.asList(maria, alex, bob));
-		insertUsers.subscribe();
+		userRepository.saveAll(Arrays.asList(maria, alex, bob)).collectList().block();
+		
+		maria = userRepository.searchEmail("maria@gmail.com").block();
+		alex = userRepository.searchEmail("alex@gmail.com").block();
+		bob = userRepository.searchEmail("bob@gmail.com").block();
 		
 		Post post1 = new Post(null, Instant.parse("2025-11-21T18:35:24.00Z"), "Partiu viagem",
 				"Vou viajar para São Paulo. Abraços!", maria.getId(), maria.getName());
@@ -50,34 +48,11 @@ public class SeedingDatabase implements CommandLineRunner {
 
 		post2.addComment("Tenha um ótimo dia!", Instant.parse("2025-11-23T18:35:24.00Z"), alex.getId(), alex.getName());
 		
-		Flux<Post> insertPosts = postRepository.saveAll(Arrays.asList(post1, post2));
-		insertPosts.subscribe();
+		post1.setUser(maria);
+		post2.setUser(maria);
 		
-		/*
-		userRepository.deleteAll();
-		postRepository.deleteAll();
+		postRepository.saveAll(Arrays.asList(post1, post2)).subscribe();
 
-		User maria = new User(null, "Maria Brown", "maria@gmail.com");
-		User alex = new User(null, "Alex Green", "alex@gmail.com");
-		User bob = new User(null, "Bob Grey", "bob@gmail.com");
-
-		userRepository.saveAll(Arrays.asList(maria, alex, bob));
-
-		Post post1 = new Post(null, Instant.parse("2022-11-21T18:35:24.00Z"), "Partiu viagem",
-				"Vou viajar para São Paulo. Abraços!", maria.getId(), maria.getName());
-		Post post2 = new Post(null, Instant.parse("2022-11-23T17:30:24.00Z"), "Bom dia", "Acordei feliz hoje!",
-				maria.getId(), maria.getName());
-		
-		post1.addComment("Boa viagem mano!", Instant.parse("2022-11-21T18:52:24.00Z"), alex.getId(), alex.getName());
-		post1.addComment("Aproveite!", Instant.parse("2022-11-22T11:35:24.00Z"), bob.getId(), bob.getName());
-
-		post2.addComment("Tenha um ótimo dia!", Instant.parse("2022-11-23T18:35:24.00Z"), alex.getId(), alex.getName());
-
-		postRepository.saveAll(Arrays.asList(post1, post2));
-
-		maria.getPosts().addAll(Arrays.asList(post1, post2));
-		userRepository.save(maria);
-		*/
 	}
 
 }

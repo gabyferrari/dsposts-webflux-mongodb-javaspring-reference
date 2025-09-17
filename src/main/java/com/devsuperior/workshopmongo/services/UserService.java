@@ -54,13 +54,4 @@ public class UserService {
 		entity.setName(dto.getName());
 		entity.setEmail(dto.getEmail());
 	}
-	
-	/*
-	@Transactional(readOnly = true)
-	public List<PostDTO> findPosts(String id) {
-		User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Recurso não encontrado"));
-		List<PostDTO> result = user.getPosts().stream().map(x -> new PostDTO(x)).toList();
-		return result;
-	}
-	*/
 }

@@ -50,12 +50,4 @@ public class UserController {
     public  Mono<ResponseEntity<Void>> delete(@PathVariable String id) {
 		return service.delete(id).then(Mono.just(ResponseEntity.noContent().<Void>build()));
 	}
-	
-	/*
-	@GetMapping(value = "/{id}/posts")
-	public ResponseEntity<List<PostDTO>> findPosts(@PathVariable String id) {
-		List<PostDTO> list = service.findPosts(id);
-		return ResponseEntity.ok().body(list);
-	}
-    */
 }
