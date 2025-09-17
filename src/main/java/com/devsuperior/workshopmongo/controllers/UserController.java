@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +39,11 @@ public class UserController {
 		return service.insert(dto).map(newUser -> ResponseEntity.created(builder.path("/users/{id}")
 				.buildAndExpand(newUser.getId()).toUri()).body(newUser));
 	}
+	
+	@PutMapping(value = "/{id}")
+	public Mono<ResponseEntity<UserDTO>> update(@PathVariable String id, @RequestBody UserDTO dto) {
+		return service.update(id, dto).map(userUpdated -> ResponseEntity.ok().body(userUpdated));
+	}
 
 	/*
 	@GetMapping(value = "/{id}/posts")
@@ -46,11 +52,7 @@ public class UserController {
 		return ResponseEntity.ok().body(list);
 	}
 	
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<UserDTO> update(@PathVariable String id, @RequestBody UserDTO dto) {
-		dto = service.update(id, dto);
-		return ResponseEntity.ok(dto);
-	}
+	
 	
 	@DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
